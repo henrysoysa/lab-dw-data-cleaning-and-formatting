@@ -6,10 +6,7 @@ def dataframe_importer():
     This function will then specify the preset specific column names for the workbooks in order to load the csv into the dataframe into df.
      """
     url = input("Please enter the csv url: ")
-    column_names = ["Customer","ST","GENDER","Education","Customer Lifetime Value",
-                "Income","Monthly Premium Auto","Number of Open Complaints","Policy Type",
-                "Vehicle Class","Total Claim Amount"]
-    df = pd.read_csv(url, usecols=column_names)
+    df = pd.read_csv(url)
     return df
 
 def column_renamer(df):
@@ -30,17 +27,21 @@ def invalid_value_cleaner(df):
     df['education'] = df['education'].replace({'Bachelors':'Bachelor'})
     car_dict = {'Sports Car':'Luxury', 'Luxury SUV':'Luxury', 'Luxury Car':'Luxury'}
     df['vehicle_class'] = df['vehicle_class'].replace(car_dict)
-    df['customer_lifetime_value'] = df['customer_lifetime_value'].str.replace('%','')
+    if df['customer_lifetime_value'].dtype == 'O':
+        df['customer_lifetime_value'] = df['customer_lifetime_value'].str.replace('%','')
     return df
 
 def datatype_formatter(df):
-    """THis function will first set CLV as a float datatype column, and then removes the first two characters from open complaints, and then removing the last 3
+    """This function will first set CLV as a float datatype column, and then removes the first two characters from open complaints, and then removing the last 3
     characters, so that 1/5/00 becomes 5; representing the number of open complaints for the particular customer."""
     df['customer_lifetime_value'] = df['customer_lifetime_value'].astype(float)
-    if len(df['number_of_open_complaints'][0]) > 1:
-        df['number_of_open_complaints'] = df['number_of_open_complaints'].str[2:-3]
+    if df['number_of_open_complaints'].dtype == 'O':
+        if len(df['number_of_open_complaints'][0]) > 1:
+            df['number_of_open_complaints'] = df['number_of_open_complaints'].str[2:-3]
+        else:
+            print("pass")
     else:
-        print("pass")
+        pass
     return df
 
 def null_value_method(df):
@@ -49,7 +50,8 @@ def null_value_method(df):
      of 952 for further analysis."""
     df['gender'] = df['gender'].fillna(df['gender'].mode()[0])
     df = df.dropna()
-    df['number_of_open_complaints'] = df['number_of_open_complaints'].astype(int)
+    if df['number_of_open_complaints'].dtype != 'int64':
+        df['number_of_open_complaints'] = df['number_of_open_complaints'].astype(int)
     return df
 
 def duplicated_formatter(df):
