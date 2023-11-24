@@ -31,14 +31,16 @@ def invalid_value_cleaner(df):
     car_dict = {'Sports Car':'Luxury', 'Luxury SUV':'Luxury', 'Luxury Car':'Luxury'}
     df['vehicle_class'] = df['vehicle_class'].replace(car_dict)
     df['customer_lifetime_value'] = df['customer_lifetime_value'].str.replace('%','')
-    df['customer_lifetime_value'].head()
     return df
 
 def datatype_formatter(df):
     """THis function will first set CLV as a float datatype column, and then removes the first two characters from open complaints, and then removing the last 3
     characters, so that 1/5/00 becomes 5; representing the number of open complaints for the particular customer."""
     df['customer_lifetime_value'] = df['customer_lifetime_value'].astype(float)
-    df['number_of_open_complaints'] = df['number_of_open_complaints'].str[2:-3]
+    if len(df['number_of_open_complaints'][0]) > 1:
+        df['number_of_open_complaints'] = df['number_of_open_complaints'].str[2:-3]
+    else:
+        print("pass")
     return df
 
 def null_value_method(df):
