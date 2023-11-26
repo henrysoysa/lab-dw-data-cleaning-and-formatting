@@ -32,14 +32,13 @@ def invalid_value_cleaner(df):
     return df
 
 def datatype_formatter(df):
-    """This function will first set CLV as a float datatype column, and then removes the first two characters from open complaints, and then removing the last 3
-    characters, so that 1/5/00 becomes 5; representing the number of open complaints for the particular customer."""
+    """This function will first set CLV as a float datatype column, and then take the middle element
+    from open complaints, so that 1/5/00 becomes 5; representing the number of open complaints for the particular customer."""
     df['customer_lifetime_value'] = df['customer_lifetime_value'].astype(float)
-    if df['number_of_open_complaints'].dtype == 'O':
-        if len(df['number_of_open_complaints'][0]) > 1:
-            df['number_of_open_complaints'] = df['number_of_open_complaints'].str[2:-3]
-        else:
-            print("pass")
+    if df['number_of_open_complaints'].dtype == 'O' and len(df['number_of_open_complaints'][0]) > 2:
+        df['number_of_open_complaints'] = df['number_of_open_complaints'].str.split('/').str[1]
+    else:
+        print('pass')
     else:
         pass
     return df
